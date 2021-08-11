@@ -1,0 +1,410 @@
+ <!DOCTYPE html>
+<html>
+<head>
+<title>JS Problems</title>
+</head>
+<body>
+
+<h1>JS Problems</h1>
+<h4>Complete the following JavaScript problems using only JavaScript to solve each problem. If you get stuck on one, you may move to the other. Show your work using comments and console log.</h4>
+<p>1. Create a feature that copies and paste the inputs from column 1 to column 2 and vice versa.</p>
+<p>2. Create a feature that displays an error message if the input is not a number when the validate button is clicked.</p>
+<p>3. Create a feature that checks the checkbox when anything is entered in the text box.</p>
+<p>4. Create a feature that creates 4 buttons and places them anywhere on the page when the create elements button is clicked ( Feel free to be creative ).</p>
+
+<h1>#1</h1>
+
+ <table style="width:30%">
+  <tr>
+    <th>
+      <button onclick="copyColumns('1')" type="button">Copy</button>
+      <button onclick="pasteColumns('1')" type="button">Paste</button>
+    </th>
+    <th>
+      <button onclick="copyColumns('2')" type="button">Copy</button> 
+      <button onclick="pasteColumns('2')" type="button">Paste</button>
+    </th>
+  </tr>
+  <tr>
+    <td>
+      <input id="col_11" type="text">
+    </td>
+    <td>
+      <input id="col_12" type="text">
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <input id="col_21" type="text">
+    </td>
+    <td>
+      <input id="col_22" type="text">
+    </td>
+  </tr>
+</table> 
+
+<hr>
+
+<h1>#2</h1>
+<input id="validation_input" type="text"><button onclick="validateNumberInput()" type="button">Validate</button>
+
+<hr>
+
+<h1>#3</h1>
+<input id="checkbox" type="checkbox" disabled><input oninput="checkBoxOnInput()" id="checkbox_input" type="text">
+
+<hr>
+
+<h1>#4</h1>
+<button onclick="createElements()" type="button">Create Elements</button>
+
+<div class="resizeable" id="el0" onmousedown="bringWindowToFront('0')">
+  <div class="mover" onmousedown="moverMousedown(event)"></div>
+  <div class="closer" onclick="closeWindow(event)">
+    <div>X</div>
+  </div>
+
+  <div class="resizer ne" onmousedown="resizerMousedown(event)"></div>
+  <div class="resizer nw" onmousedown="resizerMousedown(event)"></div>
+  <div class="resizer sw" onmousedown="resizerMousedown(event)"></div>
+  <div class="resizer se" onmousedown="resizerMousedown(event)"></div>
+  <div class="window_content">
+    <div class="window_text">1</div>
+    <button style="z-index:10" onclick="changeWindowColor(event)">Click me!</button>
+  </div>
+</div>
+
+<div class="resizeable" id="el1" onmousedown="bringWindowToFront('1')">
+  <div class="mover" onmousedown="moverMousedown(event)"></div>
+  <div class="closer" onclick="closeWindow(event)">
+    <div>X</div>
+  </div>
+
+  <div class="resizer ne" onmousedown="resizerMousedown(event)"></div>
+  <div class="resizer nw" onmousedown="resizerMousedown(event)"></div>
+  <div class="resizer sw" onmousedown="resizerMousedown(event)"></div>
+  <div class="resizer se" onmousedown="resizerMousedown(event)"></div>
+  <div class="window_content">
+    <div class="window_text">2</div>
+    <button style="z-index:10" onclick="changeWindowColor(event)">Click me!</button>
+  </div>
+</div>
+
+<div class="resizeable" id="el2" onmousedown="bringWindowToFront('2')">
+  <div class="mover" onmousedown="moverMousedown(event)"></div>
+  <div class="closer" onclick="closeWindow(event)">
+    <div>X</div>
+  </div>
+
+  <div class="resizer ne" onmousedown="resizerMousedown(event)"></div>
+  <div class="resizer nw" onmousedown="resizerMousedown(event)"></div>
+  <div class="resizer sw" onmousedown="resizerMousedown(event)"></div>
+  <div class="resizer se" onmousedown="resizerMousedown(event)"></div>
+  <div class="window_content">
+    <div class="window_text">3</div>
+    <button style="z-index:10" onclick="changeWindowColor(event)">Click me!</button>
+  </div>
+</div>
+
+<div class="resizeable" id="el3" onmousedown="bringWindowToFront('3')">
+  <div class="mover" onmousedown="moverMousedown(event)"></div>
+  <div class="closer" onclick="closeWindow(event)">
+    <div>X</div>
+  </div>
+
+  <div class="resizer ne" onmousedown="resizerMousedown(event)"></div>
+  <div class="resizer nw" onmousedown="resizerMousedown(event)"></div>
+  <div class="resizer sw" onmousedown="resizerMousedown(event)"></div>
+  <div class="resizer se" onmousedown="resizerMousedown(event)"></div>
+  <div class="window_content">
+    <div class="window_text">4</div>
+    <button style="z-index:10" onclick="changeWindowColor(event)">Click me!</button>
+  </div>
+</div>
+
+
+</body>
+
+<script>
+  /*
+    For the 'create 4 buttons' functionality, I decided to implement moveable/resizeable container elements.
+    This was one of the most recent functionalities I added to my 'Yoshieru' project. I was thinking of a way
+    to update the UI, and decided it would be fun to make it 'window-based' (similar to modern Operating Systems).
+    I got the idea from a post similar to the following:
+    https://medium.com/the-z/making-a-resizable-div-in-js-is-not-easy-as-you-think-bda19a1bc53d
+  */
+  let val1 = ''; let val2 = '';   // For the copy/paste functionality
+  
+  let zIndex = 10;  // To bring 'hidden button' containers to the front
+  
+  let colors = ["red", "orange", "yellow", "green", "blue", "indigo", "violet"];  // For the 'hidden button' container colors
+
+  // Copies the two values from a column to the 'clipboard'
+  // n: column to copy
+  const copyColumns = function(n) {
+    val1 = document.getElementById(`col_1${n}`).value;
+    val2 = document.getElementById(`col_2${n}`).value;
+    console.log("Values have been copied")
+  }
+
+  // Pastes the two values from the 'clipboard' to a column
+  // n: column to overwrite
+  const pasteColumns = function(n) {
+    document.getElementById(`col_1${n}`).value = val1;
+    document.getElementById(`col_2${n}`).value = val2;
+  }
+
+  const validateNumberInput = function() {
+    let val = document.getElementById("validation_input").value;
+    if (val == "" || val.search(/[^0-9]/) != -1) {
+      alert("Invalid input")
+    }
+    else {
+      console.log("Input is valid")
+    }
+  }
+
+  const checkBoxOnInput = function() {
+    let val = document.getElementById('checkbox_input').value;
+    let checkbox = document.getElementById('checkbox')
+    if (val != "") checkbox.checked = true;
+    else checkbox.checked = false;
+  }
+
+  // Brings a 'hidden button' container to the front when a user clicks on it
+  // n: corresponds to the container's id
+  const bringWindowToFront = function(n) {
+      let el = document.getElementById(`el${n}`);
+        el.style['z-index'] = zIndex++   // Bring component to front
+  }
+
+  // Moves the 'hidden button' containers
+  // e: click event used to detect mouseup
+  const moverMousedown = function(e) {
+      let el = e.originalTarget.parentElement
+
+      el.style.transition = 'all 0s ease 0s';  // Remove the transition delay while moving the containers
+
+      window.addEventListener('mousemove', mousemove);
+      window.addEventListener('mouseup', mouseup);
+
+      let prevX = e.clientX;
+      let prevY = e.clientY;
+
+
+      function mousemove(e) {
+        let newX = prevX - e.clientX;
+        let newY = prevY - e.clientY;
+
+        const rect = el.getBoundingClientRect();
+        el.style.left = rect.left - newX + 'px';
+        el.style.top = (rect.top - newY) + 'px';
+
+        prevX = e.clientX;
+        prevY = e.clientY;
+        
+        let name = el.id;
+      }
+
+      function mouseup() {
+        el.style.transition = 'all .2s ease';   // Add the transition delay again
+        window.removeEventListener('mousemove', mousemove)
+        window.removeEventListener('mouseup', mouseup)
+      }
+    }
+
+    // Used to resize the containers for the 'hidden buttons'
+    // e: click event to be used to detect mouseup
+    const resizerMousedown = function(e) {
+      let el = e.originalTarget.parentElement
+      
+      el.style.transition = 'all 0s ease';  // Remove the transition delay while moving the containers
+      
+      let currentResizer = e.target;
+      window.addEventListener('mousemove', mousemove);
+      window.addEventListener('mouseup', mouseup);
+
+      let prevX = e.clientX;
+      let prevY = e.clientY;
+
+      function mousemove(e) {
+
+        const rect = el.getBoundingClientRect();
+
+        // Resizing is done by keeping track of the 'resizer element' at each corner of the container
+        // When the 'resizer' is moved, the previous coordinates and current container dimensions are used to find the new width/height 
+        if (currentResizer.classList.contains('se')) {
+          el.style.width = Math.max(60, rect.width - (prevX - e.clientX)) + 'px';
+          el.style.height = Math.max(100, rect.height - (prevY - e.clientY)) + 'px';
+          el.style.left = rect.left + 'px';
+          el.style.top = rect.top + 'px';
+        }
+        else if (currentResizer.classList.contains('sw')) {
+          el.style.width = Math.max(60, rect.width + (prevX - e.clientX)) + 'px';
+          el.style.height = Math.max(100, rect.height - (prevY - e.clientY)) + 'px';
+          el.style.left = rect.left - (prevX - e.clientX) + 'px';
+          el.style.top = rect.top + 'px';
+        }
+        else if (currentResizer.classList.contains('ne')) {
+          if (rect.top > 0) {
+            el.style.width = Math.max(60, rect.width - (prevX - e.clientX)) + 'px';
+            el.style.height = Math.max(100, rect.height + (prevY - e.clientY)) + 'px';
+            el.style.left = rect.left + 'px';
+            el.style.top = (rect.top - (prevY - e.clientY)) + 'px';
+          }
+        }
+        else {    // nw
+          if (rect.top > 0) {
+            el.style.width = Math.max(60, rect.width + (prevX - e.clientX)) + 'px';
+            el.style.height = Math.max(100, rect.height + (prevY - e.clientY)) + 'px';
+            el.style.left = rect.left - (prevX - e.clientX) + 'px';
+            el.style.top = (rect.top - (prevY - e.clientY)) + 'px';
+          }
+        }
+
+        prevX = e.clientX;
+        prevY = e.clientY;
+      }
+
+      function mouseup() {
+        el.style.transition = 'all .2s ease';   // Add the transition delay again
+        window.removeEventListener('mousemove', mousemove)
+        window.removeEventListener('mouseup', mouseup)
+      }
+    }
+
+    // Closes the 'hidden buttons'
+    // e: the mouse event fired when the button is clicked
+    const closeWindow = function(e) {
+      e.originalTarget.parentElement.parentElement.style['visibility'] = 'hidden';
+    }
+
+    // Creates the 'hidden buttons' when the user clicks "Create Elements"
+    // Moves the button container to a random location and gives it a random background color
+    const createElements = function() {
+      for (let i of [0, 1, 2, 3]) {
+        let el = document.getElementById(`el${i}`)
+        let maxX = window.innerWidth - el.clientWidth;
+        let maxY = window.innerHeight - el.clientHeight;
+        el.style['left'] = Math.floor(Math.random()*maxX) + 'px';
+        el.style['top'] = Math.floor(Math.random()*maxY) + 'px';
+        el.style['visibility'] = 'visible';
+        el.style['background-color'] = colors[Math.floor(Math.random()*colors.length)];
+      }
+    }
+
+    // Changes the color of the 'hidden button' containers
+    // e: the mouse event fired when the button is clicked
+    const changeWindowColor = function(e) {
+      let el = e.originalTarget.parentElement.parentElement;
+      let colorIndex = colors.indexOf(el.style['background-color']);
+      el.style['background-color'] = colors[(colorIndex + 1) % colors.length];
+    }
+</script>
+<style>
+  
+  .resizeable{
+  visibility: hidden;
+  height: 160px;
+  width: 160px;
+  position: absolute;
+  top: 100px;
+  z-index: 2;
+  transition: all 0.1s ease;
+}
+
+
+.resizer {
+  position: absolute;
+  width: .4em;
+  height: .4em;
+  border-radius: 1em;
+  z-index: 2;
+}
+
+.resizer.nw {
+  top: -1px;
+  left: -1px;
+  cursor: nw-resize;
+}
+
+.resizer.ne {
+  top: -1px;
+  right: -1px;
+  cursor: ne-resize;
+}
+
+.resizer.sw {
+  bottom: -1px;
+  left: -1px;
+  cursor: sw-resize;
+}
+
+.resizer.se {
+  bottom: -1px;
+  right: -1px;
+  cursor: se-resize;
+}
+
+.mover{
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  z-index: 1;
+}
+
+
+.closer{
+  visibility: hidden;
+  position: absolute;
+  margin-top: .4rem;
+  margin-right: .4rem;
+  top: -6px;
+  right: -1px;
+  width: 1.4em;
+  height: 1.6em;
+  cursor: pointer;
+  z-index: 999;
+}
+
+.closer > i {
+  font-size: 1.2em !important;
+}
+
+.mover:hover ~ *{
+  visibility: visible;
+}
+
+.mover:focus-within ~ *{
+  visibility: visible;
+}
+
+.closer:hover {
+  visibility: visible;
+}
+
+.nohighlight{
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.window_content{
+  font-size: 4em;
+  height: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+}
+
+.window_text{
+  width: 100%;
+  text-align: center;
+}
+
+</style>
+</html>
